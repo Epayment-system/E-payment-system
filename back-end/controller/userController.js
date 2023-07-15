@@ -124,3 +124,4 @@ exports.login = asyncHandler(async (req, res) => {
     const user = await User.findOne({
       where: { Email }
   });
+}});
