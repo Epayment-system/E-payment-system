@@ -124,4 +124,8 @@ exports.login = asyncHandler(async (req, res) => {
     const user = await User.findOne({
       where: { Email }
   });
-}});
+
+  if (!user) {
+    res.status(404).json({
+      error: 'User not found'
+    });
