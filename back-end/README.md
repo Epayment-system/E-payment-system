@@ -19,9 +19,9 @@ npm install
 
 3. Start the server using the following command:
 
-```
+````
 npm start
-```
+```npm init
 
 4. The server will be running on http://localhost:3000 by default.
 
@@ -49,3 +49,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 ## Contact
 
 For any questions or concerns, please contact the project owner at [email address].
+````
