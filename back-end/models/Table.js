@@ -55,7 +55,7 @@ return ServiceProvider;
 
 module.exports=(sequelize,DataTypes)=>{
     const Role = Sequelize.define("Role",{
-        roleID:{
+        roleId:{
             type: DataTypes.INTEGER,
             allowNUll:false,
             primarykey: true,
