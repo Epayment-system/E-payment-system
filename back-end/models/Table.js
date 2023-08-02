@@ -52,3 +52,20 @@ ServiceProvider_contact:
 });
 return ServiceProvider;
 }
+
+module.exports=(sequelize,DataTypes)=>{
+    const Role = Sequelize.define("Role",{
+        roleID:{
+            type: DataTypes.INTEGER,
+            allowNUll:false,
+            primarykey: true,
+        },
+
+        roleName:{
+            type: DataTypes.STRING,
+            allowNUll:false
+            unique:true
+        }
+    })
+    return Role;
+};
