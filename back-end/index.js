@@ -15,7 +15,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
 //
-const db = require('./models/index.js')
+const db = require('./models/index.js')  
 db.sequelize.sync();
 
 db.sequelize.sync({force: false })
@@ -26,7 +26,7 @@ db.sequelize.sync({force: false })
 // Import controllers
 const billController = require('./controller/billController.js');
 // const agentController = require('./controllers/agentController');
-// const paymentController = require('./controllers/paymentController');
+ const paymentController = require('./controller/PaymentController');
 // const serviceController = require('./controllers/serviceController');
 // const userController = require('./controllers/userController');
 // const agentHistoryController = require('./controllers/agentHistoryController');
@@ -35,9 +35,10 @@ const billController = require('./controller/billController.js');
 
 // Import routes
 const billsRouter = require('./routes/bills.js');
-
+const paymentRouter = require('./routes/payment.js');
 // Mount routes
 app.use('/bills', billsRouter);
+app.use('/payment', paymentRouter);
 
 //testing api
 app.get('/',(req,res)=>{
@@ -56,7 +57,8 @@ app.listen(PORT, () => {
 // // set up routes
 // app.use('/agents', agentController);
 // app.use('/bills', billController);
-// app.use('/payments', paymentController);
+//app.use('/payments', paymentController);
+
 // app.use('/services', serviceController);
 // app.use('/users', userController);
 // app.use('/agentHistory', agentHistoryController);
