@@ -12,9 +12,6 @@ agentRouter.delete('/:id', AgentController.delete)
 module.exports= agentRouter
 
 
-const express = require('express');
-const serviceProvidersRouter = express.Router();
-const serviceProviderController = require('../controller/serviceproviderController');
 
 
 
