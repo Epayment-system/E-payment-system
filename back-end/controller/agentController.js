@@ -59,7 +59,7 @@ if (agentEmailOragentName('@')) {
 
 else{
   //otherwise, treat it as an agentname
-  agent =await Agents.fineOne(
+  agent =await Agents.findOne(
     {where:{agentName: agentEmailOragentName}});
 }
 
