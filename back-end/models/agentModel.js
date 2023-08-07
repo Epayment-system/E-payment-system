@@ -1,28 +1,45 @@
-const { DataTypes } = require('sequelize');
-const db = require('.');
-module.exports = (sequelize, DataTypes) => {
-    const Agents = sequelize.define('Agents', {
-        agentID: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-        },
-
-        agentName: {
+module.exports=(sequelize,DataTypes)=>{
+    const Agents = sequelize.define("Agents",{
+        agentBIN:{
             type: DataTypes.STRING,
-            allowNull: false
+            allowNUll:false,
+            //primarykey: true,
+            //unique:true,
         },
 
-        agentEmail: {
+        agentName:{
             type: DataTypes.STRING,
-            allowNull: false
+            allowNUll:false
         },
 
-        contactInfo: {
+        agentEmail:{
+            type: DataTypes.STRING,
+            allowNUll:false
+        },
+
+        agentPassword:{
+            type: DataTypes.STRING,
+            allowNUll:false
+        },
+
+        servicesOffered:{
+            type: DataTypes.STRING,
+            allowNUll:false
+        },
+
+
+        phoneNumber:{
+            type: DataTypes.STRING,
+            allowNUll:false
+        },
+
+        agentAuthorizationLetter: {
             type: DataTypes.STRING,
             allowNull: false
         }
-    });
-       
+
+
+    })
     return Agents;
-};
+}
+

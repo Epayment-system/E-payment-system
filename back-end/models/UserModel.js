@@ -3,7 +3,9 @@ module.exports =(sequelize, DataTypes) =>{
           UserID:{
               type:DataTypes.STRING,
               allowNull:false,
-              primaryKey: true,
+              //primaryKey: true,
+              unique: true,
+
           },
           FirstName:{
               type:DataTypes.STRING,
@@ -21,7 +23,7 @@ module.exports =(sequelize, DataTypes) =>{
           UserName:{
               type:DataTypes.STRING,
               allowNull:false,
-              unique: true,
+             // unique: true,
           },
           
           Password:{
@@ -32,7 +34,7 @@ module.exports =(sequelize, DataTypes) =>{
           Email:{
               type:DataTypes.STRING,
               allowNull:false,
-              unique: true,
+             // unique: true,
           },
          
          PhoneNumber:{
@@ -41,14 +43,6 @@ module.exports =(sequelize, DataTypes) =>{
           },
          Address:{
               type:DataTypes.STRING,
-              allowNull:false,
-          },
-         createdAt:{
-              type:DataTypes.DATE,
-              allowNull:false,
-          },
-         updatedAt:{
-              type:DataTypes.DATE,
               allowNull:false,
           },
          
