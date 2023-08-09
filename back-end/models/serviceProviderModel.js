@@ -28,13 +28,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNUll:false
         },
-
         BankAccountNumber:{
             type: DataTypes.STRING,
             allowNUll:false
         },
-
-
         phoneNumber:{
             type: DataTypes.STRING,
             allowNUll:false

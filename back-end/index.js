@@ -52,7 +52,7 @@ app.post('/',(req,res)=>{
 })
 
 //Port
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3010
 
 // start server
 app.listen(PORT, () => {
