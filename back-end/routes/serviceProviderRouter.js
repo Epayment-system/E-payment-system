@@ -5,6 +5,7 @@ const serviceProviderController = require('../controller/serviceproviderControll
 
 
 serviceProvidersRouter.post('/', serviceProviderController.create);
+serviceProvidersRouter.post('/login', serviceProviderController.login);
 serviceProvidersRouter.get('/', serviceProviderController.findAll);
 serviceProvidersRouter.get('/:id', serviceProviderController.findOne);
 serviceProvidersRouter.put('/:id', serviceProviderController.update);
