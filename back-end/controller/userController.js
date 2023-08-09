@@ -24,6 +24,19 @@ exports.create = asyncHandler(async (req, res) => {
     return;
   }
 
+   // Check if user already exists
+   const existingUser = await User.findOne({
+    where: {
+      Email: req.body.Email,
+    },
+  });
+
+  if (existingUser) {
+    res.status(409).send({
+      message: 'User already exists',
+    });
+    return;
+  }
   // Hash the password
   const hashedPassword = await bcrypt.hash(req.body.Password, 10);
 
@@ -107,15 +120,15 @@ exports.delete = asyncHandler(async (req, res) => {
 // User login auth
 exports.login = asyncHandler(async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { Email, Password } = req.body;
       const user = await User.findOne({ 
-        where: { email } 
+        where: { Email } 
     });
   
       if (!user) {
         res.status(404).json({ error: 'User not found' });
       } else {
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = await bcrypt.compare(Password, user.Password);
   
         if (!passwordMatch) {
           res.status(401).json({ error: 'Incorrect password' });
