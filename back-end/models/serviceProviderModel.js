@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
         },
 
         serviceProviderAuthorizationLetter: {
-            type: DataTypes.STRING,
+            type: DataTypes.BLOB,
             allowNull: false
         }
 
