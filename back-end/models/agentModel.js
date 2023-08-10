@@ -1,7 +1,7 @@
 module.exports=(sequelize,DataTypes)=>{
     const Agents = sequelize.define("Agents",{
         agentBIN:{
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNUll:false,
             primarykey: true,
         },
