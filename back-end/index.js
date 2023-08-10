@@ -27,10 +27,10 @@ db.sequelize.sync({force: false })
 
 // Import controllers
 const billController = require('./controller/billController.js');
-// const agentController = require('./controllers/agentController');
-const paymentController = require('./controller/PaymentController.js');
-// const serviceController = require('./controllers/serviceController');
-const userController = require('./controller/UserController.js');
+ const agentController = require('./controller/agentController');
+const paymentController = require('./controller/paymentController.js');
+const serviceController = require('./controller/serviceProviderController');
+const userController = require('./controller/userController.js');
 // const agentHistoryController = require('./controllers/agentHistoryController');
 // const serviceHistoryController = require('./controllers/serviceHistoryController');
 // const userHistoryController = require('./controllers/userHistoryController');
@@ -39,11 +39,16 @@ const userController = require('./controller/UserController.js');
 const billsRouter = require('./routes/billRoute.js');
 const usersRouter = require('./routes/userRoute.js');
 const paymentRouter = require('./routes/paymentRoute.js');
+const usersRouter = require('./routes/userRoute.js');
+const AgentsRouter = require('./routes/agentRoute.js');
+
 
 // Mount routes
-app.use('/bills', billsRouter);
-app.use('/Users', usersRouter);
+app.use('/bill', billsRouter);
+app.use('/serviceprovider', serviceProvidersRouter);
 app.use('/payment', paymentRouter);
+app.use('/user', usersRouter);
+app.use('/agent', AgentsRouter);
 
 //testing api
 app.get('/',(req,res)=>{
