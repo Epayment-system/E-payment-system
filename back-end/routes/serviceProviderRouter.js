@@ -1,10 +1,10 @@
+// serviceproviderRouter.js
 
 const express = require('express');
 const serviceProvidersRouter = express.Router();
 const serviceProviderController = require('../controller/serviceproviderController');
 
-
-serviceProvidersRouter.post('/', serviceProviderController.create);
+serviceProvidersRouter.post('/', serviceProviderController.upload, serviceProviderController.create);
 serviceProvidersRouter.post('/login', serviceProviderController.login);
 serviceProvidersRouter.get('/', serviceProviderController.findAll);
 serviceProvidersRouter.get('/:id', serviceProviderController.findOne);
