@@ -1,6 +1,6 @@
 const express = require('express');
 const agentRouter = express.Router();
-const AgentController = require('../controllers/agentController.js');
+const AgentController = require('../controller/agentController.js');
 
 
 agentRouter.post('/',AgentController.upload,AgentController.create)
