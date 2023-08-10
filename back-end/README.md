@@ -1,3 +1,5 @@
+Sure, here's an example of a README.md file for a back-end Express.js application:
+
 # Project Name
 
 This is a back-end project built with Express.js.
@@ -40,6 +42,7 @@ Contributions to the project are welcome. To contribute, follow these steps:
 4. Push the branch to your forked repository.
 5. Create a pull request to merge your changes into the main repository.
 
+## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
