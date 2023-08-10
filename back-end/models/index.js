@@ -25,9 +25,9 @@ db.sequelize = sequelize
 
 db.Bill = require('./billModel.js')(sequelize, Sequelize);
 db.Agents = require('./agentModel.js')(sequelize, Sequelize);
-db.User = require('./UserModel.js')(sequelize, Sequelize);
-db.Services = require('./ServiceModel.js')(sequelize, Sequelize);
-db.payment = require('./PaymentModel.js')(sequelize, Sequelize);
+db.User = require('./userModel.js')(sequelize, Sequelize);
+db.Services = require('./serviceProviderModel.js')(sequelize, Sequelize);
+db.payment = require('./paymentModel.js')(sequelize, Sequelize);
 // db.AgentHistory = require('./agentHistoryModel.js')(sequelize, Sequelize);
 // db.ServiceProviderHistory = require('./serviceProviderHistoryModel.js')(sequelize, Sequelize);
 // db.UserHistory = require('./userHistoryModel.js')(sequelize, Sequelize);
