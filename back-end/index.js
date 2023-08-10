@@ -24,7 +24,7 @@ db.sequelize.sync({force: false })
 }); 
 
 // Import controllers
-const billController = require('./controller/BillController.js')
+const billController = require('./controller/billController.js')
 const serviceController = require('./controller/serviceProviderController.js')
 const paymentController = require('./controller/paymentController.js');
 const userController = require('./controller/userController.js');
