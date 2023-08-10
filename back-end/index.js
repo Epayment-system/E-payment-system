@@ -42,6 +42,7 @@ app.use('/serviceprovider', serviceProvidersRouter);
 app.use('/payment', paymentRouter);
 app.use('/user', usersRouter);
 app.use('/agent', AgentsRouter);
+app.use ('/Images',express.static('./Images'))
 
 //testing api
 app.get('/',(req,res)=>{
