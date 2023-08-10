@@ -37,10 +37,10 @@ const usersRouter = require('./routes/userRoute.js');
 const AgentsRouter = require('./routes/agentRoute.js');
 
 // Mount routes
-app.use('/bills', billsRouter);
+app.use('/bill', billsRouter);
 app.use('/serviceprovider', serviceProvidersRouter);
 app.use('/payment', paymentRouter);
-app.use('/Users', usersRouter);
+app.use('/user', usersRouter);
 app.use('/agent', AgentsRouter);
 app.use ('/Images',express.static('./Images'))
 
