@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 
 
 
-
 const cors = require('cors');
 const app = express();
 
@@ -17,6 +16,7 @@ app.use(cors(corOptions))
 app.use(bodyParser.json())
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
+
 
 
 
@@ -35,7 +35,8 @@ const billController = require('./controller/billController.js')
 const serviceController = require('./controller/serviceProviderController.js')
 const paymentController = require('./controller/paymentController.js');
 const userController = require('./controller/userController.js');
-const AgentContoller = require('./controller/agentController.js');
+const AgentController = require('./controller/agentController.js');
+
 // Import routes
 
 const billsRouter = require('./routes/billRoute.js')
@@ -48,9 +49,10 @@ const AgentsRouter = require('./routes/agentRoute.js');
 app.use('/bill', billsRouter);
 app.use('/serviceprovider', serviceProvidersRouter);
 app.use('/payment', paymentRouter);
+
+
 app.use('/user', usersRouter);
 app.use('/agent', AgentsRouter);
-
 app.use ('/Images',express.static('./Images'))
 
 
@@ -64,16 +66,14 @@ app.post('/',(req,res)=>{
 })
 
 //Port
+
 const PORT = process.env.PORT || 3001
+
 
 // start server
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
-
-
-
-
 
 
 

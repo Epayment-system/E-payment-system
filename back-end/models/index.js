@@ -7,6 +7,7 @@ const { Model, Sequelize } = require('sequelize');
 const dbConfig = require('../config/dbconfig.js');
 
 
+
 const sequelize = new Sequelize(
   dbConfig.DB,
   dbConfig.USER,
@@ -49,7 +50,6 @@ const AgentServiceProvider = sequelize.define('agentServiceProvider', {});
 const UserServiceProvider = sequelize.define('userServiceProvider', {});
 
 
-
 // Define associations
 db.User.belongsToMany(db.Agents, { through: UserAgent,
 as: "Agents",
@@ -89,8 +89,10 @@ db.payment.belongsTo(db.User);
 
 
 
+
 db.ServiceProviders.hasMany(db.payment);
 db.payment.belongsTo(db.ServiceProviders);
+
 
 
 
@@ -110,6 +112,7 @@ db.payment.belongsTo(db.ServiceProviders);
 
 db.ServiceProviders.hasMany(db.Bill);
 db.Bill.belongsTo(db.ServiceProviders);
+
 
 
 

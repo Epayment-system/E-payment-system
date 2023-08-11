@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "root",
-    "password": "bezawit122112",
+    "password": "hamle@14",
     "database": "epayment",
     "host": "localhost",
     "dialect": "mysql"

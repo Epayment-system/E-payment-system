@@ -3,6 +3,7 @@ module.exports = {
     USER: 'root',
 
 
+
     PASSWORD: 'bezawit122112',
 
     DB: 'epayment',
