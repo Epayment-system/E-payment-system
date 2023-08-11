@@ -117,27 +117,35 @@ exports.delete = asyncHandler(async (req, res) => {
   }
 });
 
-// User login auth
+// User login and authentication
 exports.login = asyncHandler(async (req, res) => {
     try {
       const { Email, Password } = req.body;
-      const user = await User.findOne({ 
-        where: { Email } 
+      const user = await User.findOne({
+        where: { Email }
     });
-  
+
       if (!user) {
-        res.status(404).json({ error: 'User not found' });
+        res.status(404).json({
+          error: 'User not found'
+        });
       } else {
         const passwordMatch = await bcrypt.compare(Password, user.Password);
-  
         if (!passwordMatch) {
-          res.status(401).json({ error: 'Incorrect password' });
+          res.status(401).json({
+            error: 'Incorrect password'
+          });
         } else {
           const token = jwt.sign({ userId: user.id }, process.env.TOKEN_SECRET, { expiresIn: '1h' });
-          res.status(200).json({ message: 'Login successful', token });
+          res.status(200).json({
+            message: 'Login successful', token
+          });
         }
       }
     } catch (error) {
-      res.status(500).json({ error: 'Failed to login user', message: error.message });
+      res.status(500).json({
+        error: 'Failed to login user',
+        message: error.message
+      });
     }
   });
