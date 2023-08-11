@@ -1,6 +1,8 @@
 // Import necessary packages and modules
 const express = require('express');
 const bodyParser = require('body-parser');
+
+
 const cors = require('cors');
 const app = express();
 
@@ -20,6 +22,8 @@ db.sequelize.sync();
 
 db.sequelize.sync({force: false })
 .then(() => {
+
+=======
   console.log('it is working');
 }); 
 
@@ -62,6 +66,7 @@ app.listen(PORT, () => {
 
 
 // up routes
+
 // app.use('/agents', agentController);
 // app.use('/bills', billController);
 // app.use('/payments', paymentController);
@@ -73,7 +78,9 @@ app.listen(PORT, () => {
 
 // start server
 // app.listen(PORT, () => {
+
 //   console.log(Server started on port ${PORT});
+
 //   connection.connect(function(err){
 //     if (err) throw err;
 //     console.log('database connected');
