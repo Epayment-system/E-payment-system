@@ -2,6 +2,10 @@
 const { Model, Sequelize } = require('sequelize');
 
 
+const { User } = require('../models');
+
+
+
 const dbConfig = require('../config/dbconfig.js');
 
 
@@ -20,6 +24,7 @@ const sequelize = new Sequelize(
     }
   }
 );
+
 
 const db = {}
 
@@ -88,6 +93,7 @@ db.ServiceProviders.hasMany(db.payment);
 db.payment.belongsTo(db.ServiceProviders);
 
 
+
 // db.ServiceProviderHistory.hasOne(db.Payment);
 // db.Payment.belongsTo(db.ServiceProviderHistory);
 
@@ -99,8 +105,10 @@ db.payment.belongsTo(db.ServiceProviders);
 
 
 
+
 db.ServiceProviders.hasMany(db.Bill);
 db.Bill.belongsTo(db.ServiceProviders);
+
 
 
 db.payment.hasOne(db.Bill);

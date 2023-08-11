@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 
+
 const cors = require('cors');
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(bodyParser.json())
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
+
 //
 const db = require('./models/index.js')
 db.sequelize.sync();
@@ -23,7 +25,8 @@ db.sequelize.sync();
 db.sequelize.sync({force: false })
 .then(() => {
 
-=======
+
+
   console.log('it is working');
 }); 
 
@@ -34,7 +37,7 @@ const paymentController = require('./controller/paymentController.js');
 const userController = require('./controller/userController.js');
 const AgentContoller = require('./controller/agentController.js');
 // Import routes
-const billsRouter = require('./routes/billRoute.js');
+const billsRouter = require('./routes/billRoute.js')
 const serviceProvidersRouter = require('./routes/serviceProviderRoute.js');
 const paymentRouter = require('./routes/paymentRoute.js');
 const usersRouter = require('./routes/userRoute.js');
@@ -47,6 +50,7 @@ app.use('/payment', paymentRouter);
 app.use('/user', usersRouter);
 app.use('/agent', AgentsRouter);
 app.use ('/Images',express.static('./Images'))
+
 
 //testing api
 app.get('/',(req,res)=>{
@@ -67,6 +71,8 @@ app.listen(PORT, () => {
 
 // up routes
 
+
+
 // app.use('/agents', agentController);
 // app.use('/bills', billController);
 // app.use('/payments', paymentController);
@@ -79,7 +85,9 @@ app.listen(PORT, () => {
 // start server
 // app.listen(PORT, () => {
 
+
 //   console.log(Server started on port ${PORT});
+
 
 //   connection.connect(function(err){
 //     if (err) throw err;
