@@ -2,8 +2,6 @@
 const { Model, Sequelize } = require('sequelize');
 
 
-const { User } = require('../models');
-
 
 
 const dbConfig = require('../config/dbconfig.js');
@@ -89,8 +87,11 @@ db.payment.belongsTo(db.User);
 
 
 
+
+
 db.ServiceProviders.hasMany(db.payment);
 db.payment.belongsTo(db.ServiceProviders);
+
 
 
 
@@ -106,8 +107,10 @@ db.payment.belongsTo(db.ServiceProviders);
 
 
 
+
 db.ServiceProviders.hasMany(db.Bill);
 db.Bill.belongsTo(db.ServiceProviders);
+
 
 
 
