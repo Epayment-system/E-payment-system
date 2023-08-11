@@ -1,6 +1,9 @@
 // Import necessary packages and modules
 const express = require('express');
 const bodyParser = require('body-parser');
+
+
+
 const cors = require('cors');
 const app = express();
 
@@ -14,12 +17,16 @@ app.use(bodyParser.json())
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
+
+
+
 //
 const db = require('./models/index.js')
 db.sequelize.sync();
 
 db.sequelize.sync({force: false })
 .then(() => {
+
   console.log('it is working');
 }); 
 
@@ -29,9 +36,11 @@ const serviceController = require('./controller/serviceProviderController.js')
 const paymentController = require('./controller/paymentController.js');
 const userController = require('./controller/userController.js');
 const AgentController = require('./controller/agentController.js');
+
 // Import routes
-const billsRouter = require('./routes/billRoute.js');
-const serviceProvidersRouter = require('./routes/serviceProviderRouter.js');
+
+const billsRouter = require('./routes/billRoute.js')
+const serviceProvidersRouter = require('./routes/serviceProviderRoute.js');
 const paymentRouter = require('./routes/paymentRoute.js');
 const usersRouter = require('./routes/userRoute.js');
 const AgentsRouter = require('./routes/agentRoute.js');
@@ -40,8 +49,13 @@ const AgentsRouter = require('./routes/agentRoute.js');
 app.use('/bill', billsRouter);
 app.use('/serviceprovider', serviceProvidersRouter);
 app.use('/payment', paymentRouter);
-app.use('/ser', usersRouter);
+
+
+app.use('/user', usersRouter);
 app.use('/agent', AgentsRouter);
+app.use ('/Images',express.static('./Images'))
+
+
 
 //testing api
 app.get('/',(req,res)=>{
@@ -52,7 +66,9 @@ app.post('/',(req,res)=>{
 })
 
 //Port
-const PORT = process.env.PORT || 3010
+
+const PORT = process.env.PORT || 3001
+
 
 // start server
 app.listen(PORT, () => {
@@ -60,7 +76,7 @@ app.listen(PORT, () => {
 });
 
 
-// up routes
+
 // app.use('/agents', agentController);
 // app.use('/bills', billController);
 // app.use('/payments', paymentController);
@@ -72,7 +88,13 @@ app.listen(PORT, () => {
 
 // start server
 // app.listen(PORT, () => {
+
+
+
 //   console.log(Server started on port ${PORT});
+
+
+
 //   connection.connect(function(err){
 //     if (err) throw err;
 //     console.log('database connected');

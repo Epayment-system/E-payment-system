@@ -1,6 +1,12 @@
 "use strict";
 const { Model, Sequelize } = require('sequelize');
+
+
+
+
 const dbConfig = require('../config/dbconfig.js');
+
+
 
 const sequelize = new Sequelize(
   dbConfig.DB,
@@ -17,6 +23,7 @@ const sequelize = new Sequelize(
     }
   }
 );
+
 
 const db = {}
 
@@ -68,6 +75,7 @@ db.User.belongsToMany(db.ServiceProviders, { through: UserServiceProvider,
   as: "User",
   foreignKey: "serviceProviderBIN"});*/
 
+
 db.Agents.hasMany(db.payment);
 db.payment.belongsTo(db.Agents);
 
@@ -77,8 +85,17 @@ db.payment.belongsTo(db.Agents);
 db.User.hasMany(db.payment);
 db.payment.belongsTo(db.User);
 
+
+
+
+
+
 db.ServiceProviders.hasMany(db.payment);
 db.payment.belongsTo(db.ServiceProviders);
+
+
+
+
 
 // db.ServiceProviderHistory.hasOne(db.Payment);
 // db.Payment.belongsTo(db.ServiceProviderHistory);
@@ -89,8 +106,16 @@ db.payment.belongsTo(db.ServiceProviders);
 // db.Payment.hasOne(db.UserHistory);
 // db.UserHistory.belongsTo(db.Payment);
 
+
+
+
+
 db.ServiceProviders.hasMany(db.Bill);
 db.Bill.belongsTo(db.ServiceProviders);
+
+
+
+
 
 db.payment.hasOne(db.Bill);
 db.Bill.belongsTo(db.payment);
