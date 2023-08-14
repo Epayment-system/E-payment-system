@@ -8,10 +8,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        status: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
+       ,
         amount: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -28,12 +25,16 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        paymentDescription: {
+        paymentReason: {
             type: DataTypes.STRING,
             allowNull: false,
         },
 
-        receiptNumber: {
+        referenceNumber: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+          transactionID: {
             type: DataTypes.STRING,
             allowNull: false,
         },
