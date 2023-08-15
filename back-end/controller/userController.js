@@ -52,7 +52,7 @@ exports.create = asyncHandler(async (req, res) => {
     Email: req.body.Email,
     PhoneNumber: req.body.PhoneNumber,
     Address: req.body.Address,
-    Role:req.body.Address
+    Role:req.body.Role
   };
 
   // Save user in the database
