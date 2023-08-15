@@ -17,9 +17,10 @@ exports.create = asyncHandler(async (req, res) => {
     !req.body.Email ||
     !req.body.Password|| 
     !req.body.PhoneNumber ||
-    !req.body.Address) {
+    !req.body.Address ||
+     !req.body.Role) {
     res.status(400).send({
-      message: 'cannot be empty',
+      message: 'Fields cannot be empty',
     });
     return;
   }
@@ -50,7 +51,8 @@ exports.create = asyncHandler(async (req, res) => {
     Password: hashedPassword,
     Email: req.body.Email,
     PhoneNumber: req.body.PhoneNumber,
-    Address: req.body.Address
+    Address: req.body.Address,
+    Role:req.body.Address
   };
 
   // Save user in the database
@@ -71,8 +73,7 @@ exports.findOne = asyncHandler(async (req, res) => {
   const data = await User.findByPk(id);
   if (!data) {
     res.status(404).send({
-      message: 
-      (`User with id=${id} not found`),
+      message: (`User with id=${id} not found`),
     });
   } else {
     res.send(data);
