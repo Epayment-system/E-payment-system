@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const db = require('../models');
-const bcrypt = require('bcrypt');
+//const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const multer = require('multer')
@@ -15,7 +15,6 @@ exports.create = asyncHandler(async (req, res) => {
     !req.body.agentBIN ||
     !req.body.agentName ||
     !req.body.agentEmail ||
-    !req.body.agentPassword ||
     !req.body.servicesOffered ||
     !req.body.phoneNumber ||
     !req.file.path
@@ -29,7 +28,7 @@ exports.create = asyncHandler(async (req, res) => {
   // Check if agent already exists
   const existingAgent = await Agents.findOne({
     where: {
-      agentEmail: req.body.agentEmail,
+      agentBIN: req.body.agentBIN,
     },
   });
 
@@ -40,15 +39,12 @@ exports.create = asyncHandler(async (req, res) => {
     return;
   }
 
-  // Hash the password
-  const hashedPassword = await bcrypt.hash(req.body.agentPassword, 10);
 
   // Create an agent object
   const agent = {
     agentBIN: req.body.agentBIN,
     agentName: req.body.agentName,
     agentEmail: req.body.agentEmail,
-    agentPassword: hashedPassword,
     servicesOffered: req.body.servicesOffered,
     phoneNumber: req.body.phoneNumber,
     agentAuthorizationLetter: req.file.path,
@@ -117,32 +113,6 @@ exports.delete = asyncHandler(async (req, res) => {
   }
 });
 
-// Agent login auth
-exports.login = asyncHandler(async (req, res) => {
-  try {
-    const { agentEmail, agentPassword } = req.body;
-    const agent = await Agents.findOne({
-      where: { agentEmail },
-    });
-
-    if (!agent) {
-      res.status(404).json({ error: 'Agent not found' });
-    } else {
-      const passwordMatch = await bcrypt.compare(agentPassword, agent.agentPassword);
-
-      if (!passwordMatch) {
-        res.status(401).json({ error: 'Incorrect password' });
-      } else {
-        const token = jwt.sign({ agentId: agent.id }, process.env.TOKEN_SECRET, {
-          expiresIn: '1h',
-        });
-        res.status(200).json({ message: 'Login successful', token });
-      }
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to login agent', message: error.message });
-  }
-});
 
 
 // upload image
