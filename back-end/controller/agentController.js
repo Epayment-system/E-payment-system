@@ -39,7 +39,6 @@ exports.create = asyncHandler(async (req, res) => {
     return;
   }
 
-
   // Create an agent object
   const agent = {
     agentBIN: req.body.agentBIN,
@@ -112,8 +111,6 @@ exports.delete = asyncHandler(async (req, res) => {
     });
   }
 });
-
-
 
 // upload image
 const storage =multer.diskStorage({
