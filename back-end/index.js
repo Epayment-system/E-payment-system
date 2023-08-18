@@ -17,9 +17,6 @@ app.use(bodyParser.json())
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
-
-
-
 //
 const db = require('./models/index.js')
 db.sequelize.sync();
@@ -76,7 +73,6 @@ app.listen(PORT, () => {
 });
 
 
-
 // app.use('/agents', agentController);
 // app.use('/bills', billController);
 // app.use('/payments', paymentController);
@@ -89,10 +85,7 @@ app.listen(PORT, () => {
 // start server
 // app.listen(PORT, () => {
 
-
-
 //   console.log(Server started on port ${PORT});
-
 
 
 //   connection.connect(function(err){
