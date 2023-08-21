@@ -1,6 +1,12 @@
 "use strict";
 const { Model, Sequelize } = require('sequelize');
-const dbConfig = require('../config/dbConfig.js');
+
+
+
+
+const dbConfig = require('../config/dbconfig.js');
+
+
 
 const sequelize = new Sequelize(
   dbConfig.DB,
@@ -18,6 +24,7 @@ const sequelize = new Sequelize(
   }
 );
 
+
 const db = {}
 
 db.Sequelize = Sequelize
@@ -26,7 +33,7 @@ db.sequelize = sequelize
 db.Bill = require('./billModel.js')(sequelize, Sequelize);
 db.Agents = require('./agentModel.js')(sequelize, Sequelize);
 db.User = require('./UserModel.js')(sequelize, Sequelize);
-db.Services = require('./ServiceModel.js')(sequelize, Sequelize);
+db.ServiceProviders = require('./ServiceModel')(sequelize, Sequelize);
 db.payment = require('./PaymentModel.js')(sequelize, Sequelize);
 // db.AgentHistory = require('./agentHistoryModel.js')(sequelize, Sequelize);
 // db.ServiceProviderHistory = require('./serviceProviderHistoryModel.js')(sequelize, Sequelize);
@@ -43,27 +50,31 @@ const AgentServiceProvider = sequelize.define('agentServiceProvider', {});
 const UserServiceProvider = sequelize.define('userServiceProvider', {});
 
 
-// // Define associations
+// Define associations
 db.User.belongsToMany(db.Agents, { through: UserAgent,
 as: "Agents",
-foreignKey: "UserID"});
+  foreignKey: "UserID"});
+
 db.Agents.belongsToMany(db.User, { through: UserAgent, 
   as: "User",
-  foreignKey: "AgentID"});
+  foreignKey: "agentBIN"});
 
-db.Agents.belongsToMany(db.Services, { through: AgentServiceProvider,
-  as: "Services",
-  foreignKey: "AgentID" });
-db.Services.belongsToMany(db.Agents, { through: AgentServiceProvider,
+db.Agents.belongsToMany(db.ServiceProviders, { through: AgentServiceProvider,
+  as: "ServiceProviders",
+  foreignKey: "agentBIN" });
+
+/*db.ServiceProviders.belongsToMany(db.Agents, { through: AgentServiceProvider,
   as: "Agents",
-  foreignKey: "Services_id"});
+  foreignKey: "serviceProviderBIN"});*/
 
-db.User.belongsToMany(db.Services, { through: UserServiceProvider,
-  as: "Services",
+db.User.belongsToMany(db.ServiceProviders, { through: UserServiceProvider,
+  as: "ServiceProviders",
   foreignKey: "UserID"});
-db.Services.belongsToMany(db.User, { through: UserServiceProvider,
+  
+/*db.ServiceProviders.belongsToMany(db.User, { through: UserServiceProvider,
   as: "User",
-  foreignKey: "Services_id"});
+  foreignKey: "serviceProviderBIN"});*/
+
 
 db.Agents.hasMany(db.payment);
 db.payment.belongsTo(db.Agents);
@@ -74,8 +85,17 @@ db.payment.belongsTo(db.Agents);
 db.User.hasMany(db.payment);
 db.payment.belongsTo(db.User);
 
-db.Services.hasMany(db.payment);
-db.payment.belongsTo(db.Services);
+
+
+
+
+
+db.ServiceProviders.hasMany(db.payment);
+db.payment.belongsTo(db.ServiceProviders);
+
+
+
+
 
 // db.ServiceProviderHistory.hasOne(db.Payment);
 // db.Payment.belongsTo(db.ServiceProviderHistory);
@@ -86,8 +106,16 @@ db.payment.belongsTo(db.Services);
 // db.Payment.hasOne(db.UserHistory);
 // db.UserHistory.belongsTo(db.Payment);
 
-db.Services.hasMany(db.Bill);
-db.Bill.belongsTo(db.Services);
+
+
+
+
+db.ServiceProviders.hasMany(db.Bill);
+db.Bill.belongsTo(db.ServiceProviders);
+
+
+
+
 
 db.payment.hasOne(db.Bill);
 db.Bill.belongsTo(db.payment);

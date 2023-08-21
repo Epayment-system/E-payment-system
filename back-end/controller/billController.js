@@ -6,45 +6,42 @@ const Bill = db.Bill;
 // Create and save a new bill
 exports.create = asyncHandler(async (req, res) => {
   // Validate request
-  if (!req.body.billNumber ||
-    !req.body.dateIssued ||
-    !req.body.dueDate ||
-    !req.body.amountDue ||
-    !req.body.customerName ||
-    !req.body.serviceDescription ||
-    !req.body.serviceCharges ||
-    !req.body.billStatus ) {
-      
-      res.status(400).send({
-      message: 'cannot be empty',
+  const requiredFields = [
+    'billNumber',
+    'dateIssued',
+    'dueDate',
+    'amountDue',
+    'customerName',
+    'serviceDescription',
+    'serviceCharges',
+    'billStatus'
+  ];
+
+  const missingFields = requiredFields.filter(field => !req.body[field]);
+
+  if (missingFields.length > 0) {
+    res.status(400).send({
+      message: `${missingFields.join(', ')} cannot be empty`,
     });
     return;
   }
 
+  const totalAmount = calculateTotalAmount(req.body);
 
-  // Calculate the total amount by adding service charges, amount due, and any additional charges
-  const serviceCharges = parseFloat(req.body.serviceCharges);
-  const amountDue = parseFloat(req.body.amountDue);
-  const additionalCharges = parseFloat(req.body.additionalCharges || 0); // additionalCharges is optional
-  const totalAmount = serviceCharges + amountDue + additionalCharges;
-
-
-  // Create a bill object
   const bill = {
     billNumber: req.body.billNumber,
     dateIssued: req.body.dateIssued,
     dueDate: req.body.dueDate,
-    amountDue: amountDue,
+    amountDue: parseFloat(req.body.amountDue),
     customerName: req.body.customerName,
     serviceDescription: req.body.serviceDescription,
-    serviceCharges: serviceCharges,
+    serviceCharges: parseFloat(req.body.serviceCharges),
     billStatus: req.body.billStatus,
-    additionalCharges: additionalCharges,
+    additionalCharges: parseFloat(req.body.additionalCharges || 0),
     servicePeriod: req.body.servicePeriod,
     totalAmount: totalAmount
   };
 
-  // Save bill in the database
   const data = await Bill.create(bill);
   res.send(data);
 });
@@ -62,20 +59,17 @@ exports.findOne = asyncHandler(async (req, res) => {
   const data = await Bill.findByPk(id);
   if (!data) {
     res.status(404).send({
-      message:
-        (`Bill with id=${id} not found`),
+      message: `Bill with id=${id} not found`,
     });
   } else {
     res.send(data);
   }
 });
 
-
 // Update a bill by id
 exports.update = asyncHandler(async (req, res) => {
   const id = req.params.id;
 
-  // Retrieve the existing bill
   const existingBill = await Bill.findByPk(id);
 
   if (!existingBill) {
@@ -85,25 +79,12 @@ exports.update = asyncHandler(async (req, res) => {
     return;
   }
 
-  // Update the bill object with the new values
-  existingBill.billNumber = req.body.billNumber || existingBill.billNumber;
-  existingBill.dateIssued = req.body.dateIssued || existingBill.dateIssued;
-  existingBill.dueDate = req.body.dueDate || existingBill.dueDate;
-  existingBill.amountDue = req.body.amountDue || existingBill.amountDue;
-  existingBill.customerName = req.body.customerName || existingBill.customerName;
-  existingBill.serviceDescription = req.body.serviceDescription || existingBill.serviceDescription;
-  existingBill.serviceCharges = req.body.serviceCharges || existingBill.serviceCharges;
-  existingBill.billStatus = req.body.billStatus || existingBill.billStatus;
-  existingBill.additionalCharges = req.body.additionalCharges || existingBill.additionalCharges || 0; // Assign default value of 0 if not provided
-  existingBill.servicePeriod = req.body.servicePeriod || existingBill.servicePeriod;
+  updateBillFields(existingBill, req.body);
 
-  // Calculate the new totalAmount
-  const serviceCharges = parseFloat(existingBill.serviceCharges);
-  const amountDue = parseFloat(existingBill.amountDue);
-  const additionalCharges = parseFloat(existingBill.additionalCharges || 0); // additionalCharges is optional
-  existingBill.totalAmount = serviceCharges + amountDue + additionalCharges;
+  const totalAmount = calculateTotalAmount(existingBill);
 
-  // Save the updated bill in the database
+  existingBill.totalAmount = totalAmount;
+
   await existingBill.save();
 
   res.send({
@@ -125,7 +106,36 @@ exports.delete = asyncHandler(async (req, res) => {
     });
   } else {
     res.send({
-      message: (`Cannot delete bill with id=${id}. Bill not found!`),
+      message: `Cannot delete bill with id=${id}. Bill not found!`,
     });
   }
 });
+
+// Helper function to calculate the total amount
+function calculateTotalAmount(bill) {
+  const serviceCharges = parseFloat(bill.serviceCharges);
+  const amountDue = parseFloat(bill.amountDue);
+  const additionalCharges = parseFloat(bill.additionalCharges || 0);
+
+  return serviceCharges + amountDue + additionalCharges;
+}
+
+// Helper function to update the bill fields
+function updateBillFields(bill, updateData) {
+  const fieldsToUpdate = [
+    'billNumber',
+    'dateIssued',
+    'dueDate',
+    'amountDue',
+    'customerName',
+    'serviceDescription',
+    'serviceCharges',
+    'billStatus',
+    'additionalCharges',
+    'servicePeriod'
+  ];
+
+  fieldsToUpdate.forEach(field => {
+    bill[field] = updateData[field] || bill[field];
+  });
+}

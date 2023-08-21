@@ -142,8 +142,10 @@ const Dashboard = ({ isLoggedIn, setIsLoggedIn, content }) => {
             </Link>
           </Menu.Item>
           <Menu.SubMenu key="submenu" icon={<BankOutlined />} title="E-Payment System">
-            <Menu.Item key="3" icon={<SolutionOutlined />}>
-              <Link to="/admin/agents">Agents</Link>
+          <Menu.Item key="2" icon={<SolutionOutlined />}>
+              <Link to="/admin/agents/registration">Agents Registeration</Link>
+            </Menu.Item><Menu.Item key="3" icon={<SolutionOutlined />}>
+              <Link to="/admin/agents">Agents List</Link>
             </Menu.Item>
             <Menu.Item key="4" icon={<SolutionOutlined />}>
               <Link to="/admin/service-providers/registration">Service Providers Registered</Link>
@@ -152,13 +154,13 @@ const Dashboard = ({ isLoggedIn, setIsLoggedIn, content }) => {
               <Link to="/admin/service-providers">Service Providers</Link>
             </Menu.Item>
             <Menu.Item key="6" icon={<UserOutlined />}>
-              <Link to="/admin/users">Users</Link>
+              <Link to="/admin/users">Users List</Link>
             </Menu.Item>
             <Menu.Item key="7" icon={<TransactionOutlined />}>
               <Link to="/admin/transactions">Transactions</Link>
             </Menu.Item>
             <Menu.Item key="8" icon={<TransactionOutlined />}>
-              <Link to="/admin/user/registration">Users Registration</Link>
+              <Link to="/admin/user/registration">Admin Registration</Link>
             </Menu.Item>
           </Menu.SubMenu>
         </Menu>
