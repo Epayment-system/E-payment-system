@@ -33,7 +33,7 @@ module.exports=(sequelize,DataTypes)=>{
         },
 
         agentAuthorizationLetter: {
-            type: DataTypes.STRING,
+            type: DataTypes.BLOB,
             allowNull: false
         }
 
@@ -41,3 +41,4 @@ module.exports=(sequelize,DataTypes)=>{
     })
     return Agents;
 }
+

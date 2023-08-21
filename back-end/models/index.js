@@ -2,10 +2,7 @@
 const { Model, Sequelize } = require('sequelize');
 
 
-
-
 const dbConfig = require('../config/dbconfig.js');
-
 
 
 const sequelize = new Sequelize(
@@ -32,9 +29,9 @@ db.sequelize = sequelize
 
 db.Bill = require('./billModel.js')(sequelize, Sequelize);
 db.Agents = require('./agentModel.js')(sequelize, Sequelize);
-db.User = require('./UserModel.js')(sequelize, Sequelize);
-db.ServiceProviders = require('./ServiceModel')(sequelize, Sequelize);
-db.payment = require('./PaymentModel.js')(sequelize, Sequelize);
+db.User = require('./userModel.js')(sequelize, Sequelize);
+db.ServiceProviders = require('./serviceProviderModel.js')(sequelize, Sequelize);
+db.payment = require('./paymentModel.js')(sequelize, Sequelize);
 // db.AgentHistory = require('./agentHistoryModel.js')(sequelize, Sequelize);
 // db.ServiceProviderHistory = require('./serviceProviderHistoryModel.js')(sequelize, Sequelize);
 // db.UserHistory = require('./userHistoryModel.js')(sequelize, Sequelize);
@@ -87,14 +84,8 @@ db.payment.belongsTo(db.User);
 
 
 
-
-
-
 db.ServiceProviders.hasMany(db.payment);
 db.payment.belongsTo(db.ServiceProviders);
-
-
-
 
 
 // db.ServiceProviderHistory.hasOne(db.Payment);
@@ -108,13 +99,8 @@ db.payment.belongsTo(db.ServiceProviders);
 
 
 
-
-
 db.ServiceProviders.hasMany(db.Bill);
 db.Bill.belongsTo(db.ServiceProviders);
-
-
-
 
 
 db.payment.hasOne(db.Bill);

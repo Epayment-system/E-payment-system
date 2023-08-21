@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const db = require('../models');
-//const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const multer = require('multer')
@@ -15,6 +15,7 @@ exports.create = asyncHandler(async (req, res) => {
     !req.body.agentBIN ||
     !req.body.agentName ||
     !req.body.agentEmail ||
+    !req.body.agentPassword ||
     !req.body.servicesOffered ||
     !req.body.phoneNumber ||
     !req.file.path
@@ -28,7 +29,7 @@ exports.create = asyncHandler(async (req, res) => {
   // Check if agent already exists
   const existingAgent = await Agents.findOne({
     where: {
-      agentBIN: req.body.agentBIN,
+      agentEmail: req.body.agentEmail,
     },
   });
 
@@ -39,12 +40,15 @@ exports.create = asyncHandler(async (req, res) => {
     return;
   }
 
+  // Hash the password
+  const hashedPassword = await bcrypt.hash(req.body.agentPassword, 10);
 
   // Create an agent object
   const agent = {
     agentBIN: req.body.agentBIN,
     agentName: req.body.agentName,
     agentEmail: req.body.agentEmail,
+    agentPassword: hashedPassword,
     servicesOffered: req.body.servicesOffered,
     phoneNumber: req.body.phoneNumber,
     agentAuthorizationLetter: req.file.path,
@@ -138,3 +142,4 @@ exports.upload = multer({
     cb('provide the proper format');
   }
 }).single('agentAuthorizationLetter');
+
