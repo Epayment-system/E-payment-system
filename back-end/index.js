@@ -1,7 +1,6 @@
 // Import necessary packages and modules
 const express = require('express');
 const bodyParser = require('body-parser');
-
 const cors = require('cors');
 const app = express();
 
@@ -44,12 +43,9 @@ const AgentsRouter = require('./routes/agentRoute.js');
 app.use('/bill', billsRouter);
 app.use('/serviceprovider', serviceProvidersRouter);
 app.use('/payment', paymentRouter);
-
-
 app.use('/user', usersRouter);
 app.use('/agent', AgentsRouter);
 app.use ('/Images',express.static('./Images'))
-
 
 
 //testing api
