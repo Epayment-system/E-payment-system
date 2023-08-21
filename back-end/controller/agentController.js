@@ -1,11 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const db = require('../models');
-//const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const multer = require('multer')
 const path = require ('path')
-
 const Agents = db.Agents;
 
 // Create and save a new agent
