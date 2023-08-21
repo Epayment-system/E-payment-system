@@ -16,11 +16,6 @@ module.exports=(sequelize,DataTypes)=>{
             allowNUll:false
         },
 
-        agentPassword:{
-            type: DataTypes.STRING,
-            allowNUll:false
-        },
-
         servicesOffered:{
             type: DataTypes.STRING,
             allowNUll:false
