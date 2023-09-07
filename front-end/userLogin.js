@@ -2,19 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Input } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import {GoogleOAuthProvider} from '@react-oauth/google';
-import {GoogleLogin} from '@react-oauth/google';
-import jwt_decode from 'jwt-decode';
-
-import './index.css'; // Import custom CSS file
+import './index.css'; // Import CSS file
 import axios from './api/axios';
 
 const UserLogin = () => {
-  const [Email, setEmail] = useState('');
-  const [Password, setPassword] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [Email, setEmail] = useState(''); // State for email input
+  const [Password, setPassword] = useState(''); // State for password input
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
+  const [loading, setLoading] = useState(false); // State to track loading state
+  const navigate = useNavigate(); // React Router hook for navigation
 
   useEffect(() => {
     // Load Google Sign-In API script dynamically
@@ -24,9 +20,10 @@ const UserLogin = () => {
     document.body.appendChild(script);
 
     script.onload = () => {
+      // Initialize Google Sign-In API with client ID and callback
       window.google.accounts.id.initialize({
         client_id: '587101034562-48rg0utnf5bs3cem5mcmqpftmg9urf9t.apps.googleusercontent.com',
-        callback:" handleGoogleSignIn",
+        callback: 'handleGoogleSignIn',
       });
     };
 
@@ -37,18 +34,18 @@ const UserLogin = () => {
   }, []);
 
   const handleEmailChange = (e) => {
-    setEmail(e.target.value);
+    setEmail(e.target.value); // Update email state on input change
   };
 
   const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+    setPassword(e.target.value); // Update password state on input change
   };
 
   const handleSubmit = async () => {
-    setLoading(true);
+    setLoading(true); // Set loading state to true
     // navigate('/Users/logout');
-
     try {
+      // Send login request to the server
       const response = await axios.post('http://localhost:3000/Users/login', {
         Email: Email,
         Password: Password,
@@ -57,7 +54,7 @@ const UserLogin = () => {
       const data = await response.data;
 
       if (response.status === 200) {
-        setIsLoggedIn(true);
+        setIsLoggedIn(true); // Set login status to true
         console.log('User logged in successfully');
       } else if (response.status === 400) {
         console.error('Bad request:', data.error);
@@ -68,58 +65,46 @@ const UserLogin = () => {
       console.error('An error occurred during User login:', error);
     }
 
-    setLoading(false);
-
-    setEmail('');
-    setPassword('');
+    setLoading(false); // Reset loading state
+    setEmail(''); // Clear email input
+    setPassword(''); // Clear password input
   };
-  
-  // const handleLogout = () => {
-  //   setIsLoggedIn(false);
-  // };
- 
+
   const handleForgetPasswordClick = () => {
-    navigate('/reset-password');
+    navigate('/Users/resetpassword'); // Navigate to password reset page
   };
 
   // Define the handleGoogleSignIn function
-window.handleGoogleSignIn = async (response) => {
-  const { credential } = response;
-  setLoading(true);
+  window.handleGoogleSignIn = async (response) => {
+    const { credential } = response;
+    setLoading(true); // Set loading state to true
 
-  try {
-    // Verify the ID Token
-    // const decodedToken = jwt_decode(credential);
+    try {
+      // Make the API request with the verified token
+      const googleResponse = await axios.post(
+        'https://www.googleapis.com/oauth2/v3/tokeninfo',
+        {
+          id_token: credential, // Update the property name to 'id_token'
+        }
+      );
 
-    // // Access token claims
-    // const { Email } = decodedToken;
+      const data = await googleResponse.data;
 
-    // Perform further validation or processing with the claims
-
-    // Make the API request with the verified token
-    const googleResponse = await axios.post(
-      'http://localhost:3000/Users/googleSignIn',
-      {
-        token: credential, // Update the property name to 'token'
+      if (googleResponse.status === 200) {
+        setIsLoggedIn(true); // Set login status to true
+        console.log('User logged in with Google successfully');
+       
+      } else {
+        console.error('Google login failed:', data.error);
       }
-    );
-
-    const data = await googleResponse.data;
-
-    if (googleResponse.status === 200) {
-      setIsLoggedIn(true);
-      console.log('User logged in with Google successfully');
-    } else {
-      console.error('Google login failed:', data.error);
+    } catch (error) {
+      console.error('An error occurred during Google login:', error);
     }
-  } catch (error) {
-    console.error('An error occurred during Google login:', error);
-  }
 
-  setLoading(false);
-};
-  
-return (
+    setLoading(false); // Reset loading state
+  };
+
+  return (
     <div className="login">
       <h1>Login</h1>
       <Form className="form" onFinish={handleSubmit}>
@@ -129,7 +114,7 @@ return (
         <Input
           type="text"
           name="Email"
-          placeholder="Username or Email"
+          placeholder="Email Address"
           id="Email"
           required
           value={Email}
@@ -152,11 +137,8 @@ return (
         </Button>
         <p>Create an account <a href="/signup">here</a>.</p>
         <a href="#/" onClick={handleForgetPasswordClick}>Forget Password</a>
-        <div id="g_id_onload"
-         data-client_id='587101034562-48rg0utnf5bs3cem5mcmqpftmg9urf9t.apps.googleusercontent.com'
-         data-callback="handleGoogleSignIn">
-       </div>
-       <div className="g_id_signin"></div>
+        <div id="g_id_onload" data-client_id='587101034562-48rg0utnf5bs3cem5mcmqpftmg9urf9t.apps.googleusercontent.com' data-callback="handleGoogleSignIn"></div>
+        <div className="g_id_signin"></div>
       </Form>
     </div>
   );
