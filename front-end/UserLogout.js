@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './index.css'; // Import custom CSS file
 
 const LogoutPage = () => {
   const [loading, setLoading] = useState(false);
@@ -11,21 +10,32 @@ const LogoutPage = () => {
   const handleLogout = async () => {
     try {
       setLoading(true); // Set loading to true during logout process
-      const response = await axios.post('http://localhost:3000/Users/logout');
+
+      // Check if the user is logged in before making the logout request
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        console.error('User is not logged in');
+        setLoading(false); // Set loading back to false
+        return;
+      }
+
+      const response = await axios.post('http://localhost:3000/Users/logout', null, {
+        headers: { Authorization: token },
+      });
       sessionStorage.clear();
       setLoading(false); // Set loading back to false after logout
-  
+
       if (response.status === 200) {
-        console.log('User Logged out successfully');
+        console.log('User logged out successfully');
+        navigate('/Users/login'); // Redirect to login page after successful logout
       } else {
         console.error('Logout failed:', response.data.error);
       }
-  
-      navigate('/Users/login'); // Redirect to logout page after successful logout
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
+
   return (
     <div>
       <Button
