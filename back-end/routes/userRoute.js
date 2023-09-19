@@ -3,7 +3,7 @@ const userRouter = express.Router();
 
 const userController = require('../controller/UserController.js');
 
-// Define routes for bills resource
+// Define routes for users resource
 userRouter.post('/', userController.create);
 userRouter.get('/', userController.findAll);
 userRouter.get('/:id', userController.findOne);
