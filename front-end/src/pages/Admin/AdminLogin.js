@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { Form, Button, message } from 'antd';
+import { Form, Button } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
 import './style.css'; // Import custom CSS file
 
 
-
 const AdminLogin = () => {
-  const [Identifier, setIdentifier] = useState('');
+  const [UserName, setUserName] = useState('');
   const [Password, setPassword] = useState('');
+  const [Email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [adminData, setAdminData] = useState([]);
+  const { adminId } = useParams();
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Move isLoggedIn state here
 
-  const handleIdentifierChange = (e) => {
-    setIdentifier(e.target.value);
+  const handleUsernameChange = (e) => {
+    setUserName(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -32,7 +31,7 @@ const AdminLogin = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ identifier: Identifier, Password: Password }),
+        body: JSON.stringify({ UserName, Email, Password }),
       });
   
       const data = await response.json();
@@ -40,35 +39,24 @@ const AdminLogin = () => {
       if (response.ok) {
         if (data && data.token) {
           localStorage.setItem('adminToken', data.token);
-          localStorage.setItem('adminData', JSON.stringify(data.user)); // Store adminData as JSON
-  
-          // Check if the user has the admin role
-          if (data.user.Role === 'Admin') {
-            setIsLoggedIn(true);
-            console.log('Admin logged in successfully');
-            console.log(`${data.token},${data.user.id}`);
-            console.log(localStorage.getItem('adminData'));
-            navigate(`/Admin/Dashboard/${data.user.id}`);
-          } else {
-            message.error('You are not authorized to access the admin page.');
-            console.error('User does not have admin role');
-          }
+          setIsLoggedIn(true);
+          console.log('Admin logged in successfully');
+          console.log(`${data.token},${data.user.id}`);
+          navigate(`/admin/dashboard/${data.user.id}`);
         } else {
-        message.error('Server error');
-      console.error('Invalid server response:', data);
+          console.error('Invalid server response:', data);
         }
       } else {
-        message.error('Admin login failed');
-        message.error('Insert valid username and password');
         console.error('Admin login failed:', data.error);
       }
     } catch (error) {
-      message.error('An error occurred during admin login');
       console.error('An error occurred during admin login:', error);
     }
   
     setLoading(false);
-    setIdentifier('');
+  
+    setUserName('');
+    setEmail('');
     setPassword('');
   };
 
@@ -76,17 +64,17 @@ const AdminLogin = () => {
     <div className="login">
       <h1>Login</h1>
       <Form className="form" onFinish={handleSubmit}>
-        <label htmlFor="identifier">
+        <label htmlFor="username">
           <UserOutlined className="icon" />
         </label>
         <input
           type="text"
-          name="identifier"
+          name="username"
           placeholder="Username or Email"
-          id="identifier"
+          id="username"
           required
-          value={Identifier}
-          onChange={handleIdentifierChange}
+          value={UserName}
+          onChange={handleUsernameChange}
         />
         <label htmlFor="password">
           <LockOutlined className="icon" />
@@ -101,7 +89,7 @@ const AdminLogin = () => {
           onChange={handlePasswordChange}
         />
         <Button className="button" type="primary" htmlType="submit" loading={loading} disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          Login
         </Button>
       </Form>
     </div>
@@ -109,6 +97,3 @@ const AdminLogin = () => {
 };
 
 export default AdminLogin;
-
-
-

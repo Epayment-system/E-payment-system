@@ -1,46 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
 import { UserOutlined } from '@ant-design/icons';
-import { Layout, Menu, Avatar, Button, message, Form, Input, Upload, Modal, Select } from 'antd';
+import { Layout, Menu, Avatar, Button, message, Form, Input, Upload, Modal } from 'antd';
 import Dashboard from './Dashboard';
 
 const AdminRegistrationForm = () => {
-  const navigate = useNavigate();
-  if (!localStorage.getItem('adminData')) {
-    navigate('/admin/login');
-  }
-
-  const { Option } = Select;
-  const [counter, setCounter] = useState(1);
-
-  const getNextUserID = () => {
-    const timestamp = Date.now().toString(); // Get the current timestamp
-    const randomNumber = Math.floor(Math.random() * 10000).toString(); // Generate a random number between 0 and 9999
-    return `P${timestamp}${randomNumber}`;
-  };
-
-  const incrementCounter = () => {
-    setCounter((prevCounter) => prevCounter + 1);
-  };
-
-  const [adminData, setAdminData] = useState(JSON.parse(localStorage.getItem('adminData')));
-  const [form] = Form.useForm();
-  const [profilePictureUrl, setProfilePictureUrl] = useState(JSON.parse(localStorage.getItem('adminData'))?.ProfilePicture);
-  const { adminId } = useParams();
   const [formData, setFormData] = useState({
-    UserID: getNextUserID(),
     FirstName: '',
     LastName: '',
     Gender: '',
     UserName: '',
     Password: '',
     Email: '',
-    PhoneNumber: '+251',
+    PhoneNumber: '',
     Address: '',
     Role: 'Admin',
   });
 
+  const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
@@ -86,22 +63,7 @@ const AdminRegistrationForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  useEffect(() => {
-    const Admin = localStorage.getItem('adminData');
-    if (Admin) {
-      try {
-        const parsedAdminData = JSON.parse(Admin);
-        setFormData(parsedAdminData);
-        setAdminData(parsedAdminData);
-      } catch (error) {
-        console.error('Error parsing admin data:', error);
-        message.error('Error parsing admin data');
-        // Handle error while parsing the data from localStorage
-      }
-    }
-  }, []);
-
-  const handleFormChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -110,138 +72,119 @@ const AdminRegistrationForm = () => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    const url = URL.createObjectURL(file);
-    setProfilePictureUrl(url);
-    setFormData((prevData) => ({
-      ...prevData,
-      ProfilePicture: file,
-    }));
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
   };
 
-  const handleSave = async (e) => {
-    try {
-      // Get form values
-      const values = await form.validateFields(); // Validate the form fields and get the values
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      try {
+        const formDataToSend = new FormData();
+        formDataToSend.append('FirstName', formData.FirstName);
+        formDataToSend.append('LastName', formData.LastName);
+        formDataToSend.append('Gender', formData.Gender);
+        formDataToSend.append('UserName', formData.UserName);
+        formDataToSend.append('Password', formData.Password);
+        formDataToSend.append('Email', formData.Email);
+        formDataToSend.append('PhoneNumber', formData.PhoneNumber);
+        formDataToSend.append('Address', formData.Address);
+        formDataToSend.append('Role', formData.Role);
+        formDataToSend.append('ProfilePicture', file);
 
-      // Update the formData state with the form values
-      setFormData((prevData) => ({
-        ...prevData,
-        ...values,
-        Role: 'Admin',
-      }));
-
-      // Create a new FormData object
-      const updatedAdminData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        if (key === 'ProfilePicture') {
-          // Skip the ProfilePicture field if it's not updated
-          if (formData.ProfilePicture) {
-            updatedAdminData.append(key, formData.ProfilePicture);
-          }
-        } else {
-          updatedAdminData.append(key, value);
-        }
-      });
-      updatedAdminData.append('Role', 'Admin');
-
-      // Send the updated admin profile to the server
-      const response = await axios.post(`http://localhost:3000/Users`, updatedAdminData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: adminData.token,
-        },
-      });
-
-      // Handle the response from the server
-      if (response.status === 200) {
-
-        form.resetFields();
-        window.location.href = window.location.href;
-        message.success('Admin Registered updated successfully');
-      } else {
-        message.error('Failed to register admin');
+        await axios.post('http://localhost:3000/admin', formDataToSend);
+        console.log('Registered successfully!');
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        // Handle the error, show an error message, etc.
       }
-    } catch (error) {
-      console.error('Error registering admin:', error);
-      message.error('Error registering admin');
     }
-    
   };
 
   return (
-    <Layout>
-      <Dashboard content={
-        <Layout.Content className="admin-registration-content">
-          <div className="admin-registration-wrapper">
-            <div className="admin-registration-header">
-            </div>
-            <Form
-              form={form}
-              layout="vertical"
-              initialValues={formData}
-              onChange={handleFormChange}
-              onFinish={handleSave}
-            >
-              <Form.Item label="UserID" name="UserID" rules={[{ required: true }]}>
-                <Input defaultValue={`${formData.UserID}`} disabled />
-              </Form.Item>
-              <Form.Item label="First Name" name="FirstName" rules={[{ required: true }]}>
-                <Input placeholder="Enter First Name" />
-              </Form.Item>
-              {errors.FirstName && <p className="error-message">{errors.FirstName}</p>}
-              <Form.Item label="Last Name" name="LastName" rules={[{ required: true }]}>
-                <Input placeholder="Enter Last Name" />
-              </Form.Item>
-              {errors.LastName && <p className="error-message">{errors.LastName}</p>}
-              <Form.Item label="Gender" name="Gender" rules={[{ required: true }]}>
-                <Select>
-                  <Option value="male">Male</Option>
-                  <Option value="female">Female</Option>
-                </Select>
-              </Form.Item>
-              {errors.Gender && <p className="error-message">{errors.Gender}</p>}
-              <Form.Item label="User Name" name="UserName" rules={[{ required: true }]}>
-                <Input placeholder="Enter User Name" />
-              </Form.Item>
-              {errors.UserName && <p className="error-message">{errors.UserName}</p>}
-              <Form.Item label="Password" name="Password" rules={[{ required: true }]}>
-                <Input.Password placeholder="Enter Password" />
-              </Form.Item>
-              {errors.Password && <p className="error-message">{errors.Password}</p>}
-              <Form.Item label="Email" name="Email" rules={[{ required: true, type: 'email' }]}>
-                <Input placeholder="Enter Email" />
-              </Form.Item>
-              {errors.Email && <p className="error-message">{errors.Email}</p>}
-              <Form.Item label="Phone Number" name="PhoneNumber" rules={[{ required: true, pattern: /^\+?\d+$/ }]}>
-                <Input placeholder="Enter Phone Number" />
-              </Form.Item>
-              {errors.PhoneNumber && <p className="error-message">{errors.PhoneNumber}</p>}
-              <Form.Item label="Address" name="Address" rules={[{ required: true }]}>
-                <Input placeholder="Enter Address" />
-              </Form.Item>
-              {errors.Address && <p className="error-message">{errors.Address}</p>}
-              <Form.Item name="ProfilePicture" >
-                <label htmlFor="profilePicture">Profile Picture:</label>
-                <input
-                  type="file"
-                  id="profilePicture"
-                  accept=".jpeg, .jpg, .png, .gif"
-                  onChange={handleFileChange}
-                />
-                {profilePictureUrl && (
-                  <img src={profilePictureUrl} alt="Profile" style={{ width: '200px' }} />
-                )}
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Register
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
-        </Layout.Content>} />
-    </Layout>
+    <Dashboard
+      content={
+        <Form name="adminRegistrationForm" onSubmit={handleSubmit}>
+          <h1>Admin Registration</h1>
+          <Form.Item
+            name="FirstName"
+            label="First Name"
+            rules={[{ required: true, message: 'Please enter your First Name' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="LastName"
+            label="Last Name"
+            rules={[{ required: true, message: 'Please enter your Last Name' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="Gender"
+            label="Gender"
+            rules={[{ required: true, message: 'Please select your Gender' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="UserName"
+            label="User Name"
+            rules={[{ required: true, message: 'Please enter your User Name' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="Password"
+            label="Password"
+            rules={[{ required: true, message: 'Please enter your Password' }]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="Email"
+            label="Email"
+            rules={[
+              { required: true, message: 'Please enter your Email' },
+              { type: 'email', message: 'Please enter a valid Email' },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="PhoneNumber"
+            label="Phone Number"
+           rules={[{ required: true, message: 'Please enter your Phone Number' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="Address"
+            label="Address"
+            rules={[{ required: true, message: 'Please enter your Address' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item name="ProfilePicture" label="Profile Picture">
+            <input type="file" name="ProfilePicture" onChange={handleFileChange} />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      }
+    />
   );
 };
 

@@ -9,13 +9,10 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
   const [form] = Form.useForm();
   const [editMode, setEditMode] = useState(false);
   const [agent, setAgent] = useState(null);
-  const [agentAuthorizationLetterUrl, setAgentAuthorizationLetterUrl] = useState()
-  const [selectedMenu, setSelectedMenu] = useState(['3']);
 
   useEffect(() => {
-    localStorage.setItem("selectedMenu", selectedMenu);
     fetchAgents();
-  }, [selectedMenu]);
+  }, []);
 
   const fetchAgents = async () => {
     try {
@@ -30,7 +27,6 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
     form.setFieldsValue(agent);
     setEditMode(true);
     setAgent(agent);
-    setAgentAuthorizationLetterUrl(`http://localhost:3000/${agent.agentAuthorizationLetter}`);
   };
 
   const handleSave = () => {
@@ -43,26 +39,25 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
       onOk: () => {
         // Get form values
         form.validateFields().then((values) => {
-          const updatedAgent = { ...values, agentBIN: agent.agentBIN }; // Use agentBIN as the primary key
-  
+          const updatedAgent = { ...values, id: agent.id };
+
           // Create FormData object
           const formData = new FormData();
           formData.append('agentAuthorizationLetter', values.agentAuthorizationLetter[0]); // Assuming only one file is selected
-  
-          setAgentAuthorizationLetterUrl(`http://localhost:3000/${formData.agentAuthorizationLetter}`)
+
           // Update agent data
           axios
-            .put(`http://localhost:3000/agents/${updatedAgent.agentBIN}`, updatedAgent) // Use agentBIN as the primary key
+            .put(`http://localhost:3000/agents/${updatedAgent.id}`, updatedAgent)
             .then((response) => {
               if (response.status === 200) {
                 // Upload file separately
                 axios
-                  .put(`http://localhost:3000/agents/${updatedAgent.agentBIN}`, formData) // Use agentBIN as the primary key
+                  .put(`http://localhost:3000/agents/${updatedAgent.id}`, formData)
                   .then((uploadResponse) => {
                     if (uploadResponse.status === 200) {
                       message.success('Agent data and file updated successfully.');
                       const updatedData = agentData.map((agent) =>
-                        agent.agentBIN === updatedAgent.agentBIN ? updatedAgent : agent // Use agentBIN to match the updated agent
+                        agent.id === updatedAgent.id ? updatedAgent : agent
                       );
                       setAgentData(updatedData);
                       setEditMode(false);
@@ -86,7 +81,7 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
     });
   };
 
-  const handleDelete = (agentBIN) => {
+  const handleDelete = (agentId) => {
     Modal.confirm({
       title: 'Confirm Delete',
       content: 'Are you sure you want to delete this agent?',
@@ -95,11 +90,11 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
       cancelText: 'Cancel',
       onOk: () => {
         axios
-          .delete(`http://localhost:3000/agents/${agentBIN}`) // Use agentBIN as the primary key
+          .delete(`http://localhost:3000/agents/${agentId}`)
           .then((response) => {
             if (response.status === 200) {
               message.success('Agent deleted successfully.');
-              const updatedData = agentData.filter((agent) => agent.agentBIN !== agentBIN); // Use agentBIN to filter out the deleted agent
+              const updatedData = agentData.filter((agent) => agent.id !== agentId);
               setAgentData(updatedData);
             } else {
               message.error('Failed to delete agent.');
@@ -127,11 +122,6 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
       title: 'Agent Email',
       dataIndex: 'agentEmail',
       key: 'agentEmail',
-    },
-    {
-      title: 'Services Offered',
-      dataIndex: 'servicesOffered',
-      key: 'servicesOffered',
     },
     {
       title: 'Phone Number',
@@ -172,14 +162,14 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
       render: (_, agent) => (
         <div>
           <Button onClick={() => handleEdit(agent)} icon={<EditOutlined />} type="danger">Edit</Button>
-          <Button onClick={() => handleDelete(agent.agentBIN)} icon={<DeleteOutlined />} type="danger">Delete</Button>
+          <Button onClick={() => handleDelete(agent.id)} icon={<DeleteOutlined />} type="danger">Delete</Button>
         </div>
       ),
     },
   ];
 
   return (
-    <Dashboard selectedMenu={selectedMenu} content={
+    <Dashboard isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} content={
       <div>
         <h1>Agents List</h1>
         <Table dataSource={agentData} columns={columns} scroll={{ x: true }} />
@@ -190,7 +180,6 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
           onCancel={() => {
             setEditMode(false);
             form.resetFields();
-
           }}
           footer={null}
         >
@@ -204,9 +193,6 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
             <Form.Item name="agentEmail" label="Agent Email">
               <Input />
             </Form.Item>
-            <Form.Item name="servicesOffered" label="Services Offered">
-              <Input />
-            </Form.Item>
             <Form.Item name="phoneNumber" label="Phone Number">
               <Input />
             </Form.Item>
@@ -214,9 +200,6 @@ const AgentsList = ({ isLoggedIn, setIsLoggedIn }) => {
               <Upload accept=".jpeg, .jpg, .png, .gif" beforeUpload={() => false}>
                 <Button icon={<UploadOutlined />}>Select File</Button>
               </Upload>
-              {agentAuthorizationLetterUrl && (
-                <img src={agentAuthorizationLetterUrl} alt="agent authorization letter" style={{ width: '200px' }} />
-              )}
             </Form.Item>
             <Button type="primary" onClick={handleSave}>
               Save

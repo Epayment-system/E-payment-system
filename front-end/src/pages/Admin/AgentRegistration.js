@@ -1,176 +1,194 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+//import {Form,Button}from 'antd';
 import axios from "axios";
+import "./agentRegistration.css";
 import { Layout, Menu, Avatar, Button, message, Form, Input, Upload, Modal } from 'antd';
 import Dashboard from "./Dashboard";
-import { useNavigate, useParams } from "react-router-dom";
 
-const AgentRegistrationForm = () => {
-  //const { adminId } = useParams();
-  // const navigate = useNavigate();
-  // if (!localStorage.getItem('adminData')) {
-  //   navigate('/admin/login');
-  // }
-  const [form] = Form.useForm();
-  const [agentData, setAgentData] = useState({
-    agentBIN: '',
-    agentName: '',
-    agentEmail: '',
-    servicesOffered: '',
-    phoneNumber: '+251',
-    agentAuthorizationLetter: null,
+
+
+
+const RegistrationForm = () => {
+  const [formData, setFormData] = useState({
+    agentBIN: "",
+   agentName: "",
+    agentEmail: "",
+    servicesOffered: "",
+    phoneNumber: "+251",
+    agentAuthorizationLetter: null,//changed to null
   });
-  const [file, setFile] = useState(null);
+
   const [errors, setErrors] = useState({});
-  const [agentAuthorizationLetterUrl, setAgentAuthorizationLetterUrl] = useState();
 
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!agentData.agentBIN) {
+    // Business Identification Number validation
+    if (!formData.agentBIN) {
       newErrors.agentBIN = "Business Identification Number is required";
     }
 
-    if (!agentData.agentName) {
+    // Bank Name validation
+    if (!formData.agentName) {
       newErrors.agentName = "Bank Name is required";
     }
 
-    if (!agentData.agentEmail) {
+    // Email validation
+    if (!formData.agentEmail) {
       newErrors.agentEmail = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(agentData.agentEmail)) {
+    } else if (!/\S+@\S+\.\S+/.test(formData.agentEmail)) {
       newErrors.agentEmail = "Email is invalid";
     }
 
-    if (!agentData.servicesOffered) {
+    // Services Offered validation
+    if (!formData.servicesOffered) {
       newErrors.servicesOffered = "Services Offered is required";
     }
 
-    
-    if (!agentData.phoneNumber) {
-      newErrors.phoneNumber = 'Phone Number is required';
-    } else if (!/^\+?\d+$/.test(agentData.phoneNumber)) {
-      newErrors.phoneNumber = 'Phone Number is invalid';
+    // Phone Number validation
+
+    if (!formData.phoneNumber) {
+      newErrors.phoneNumber = "Phone Number is required";
+    } else if (!/^\+[0-9\s-()]+$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = "Phone Number is invalid";
+    } else if (formData.phoneNumber.replace(/[^\d]/g, "").length < 12) {
+      newErrors.phoneNumber = "Phone Number must have at least 12 digits";
     }
 
+    // Agent Authorization Letter validation
+    if (!formData.agentAuthorizationLetter) {
+      newErrors.agentAuthorizationLetter = "Agent Authorization Letter is required";
+    }else if (!isFileValid(formData.agentAuthorizationLetter)) {
+      newErrors.agentAuthorizationLetter = "Invalid file format. Only JPG, JPEG, PNG, or PDF files are allowed.";
+    }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0; // Return true if there are no errors
   };
 
+  const isFileValid = (file) => {
+    const allowedFileTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+    return allowedFileTypes.includes(file.type);
+  };
+  
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      try{
+        const formDataToSend = new FormData();
+        formDataToSend.append('agentBIN', formData.agentBIN);
+        formDataToSend.append('agentName', formData.agentName);
+        formDataToSend.append('agentEmail', formData.agentEmail);
+        formDataToSend.append('servicesOffered', formData.servicesOffered);
+        formDataToSend.append('phoneNumber', formData.phoneNumber);
+        formDataToSend.append('agentAuthorizationLetter',formData.agentAuthorizationLetter );
+            
+        //make an HTTP post request to the backend
+        axios.post('http://localhost:3001/agent', formDataToSend);
+        console.log('Registered successfully!');
+      } catch (error) {
+        // show an error message
+        console.error('Error submitting form:', error);
+       
+      }
+    }
+  };
+      
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setAgentData((prevData) => ({
+    setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
-
-  
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    const url = URL.createObjectURL(selectedFile);
-    setAgentAuthorizationLetterUrl(url);
-    setFile(selectedFile);
+    const file = e.target.files[0];
+    setFormData((prevData) => ({
+      ...prevData,
+      agentAuthorizationLetter: file,
+    }));
   };
+return (
+    <Dashboard content={<Form name="agentRegistrationForm" onFinish={handleSubmit}>
+    <h1>Agent Registration</h1>
 
-  
-  const handleSubmit = async () => {
-    if (validateForm()) {
-      try {
+    <Form.Item
+      label="Business Identification Number"
+      name="agentBIN"
+      rules={[{ required: true, message: 'Please enter the Business Identification Number' }]}
+      hasFeedback
+      validateStatus={errors.agentBIN ? 'error' : ''}
+      help={errors.agentBIN}
+    >
+      <Input value={formData.agentBIN} onChange={handleChange} placeholder="Enter business identification number" />
+    </Form.Item>
 
-      const formData = new FormData();
-      formData.append("agentBIN", agentData.agentBIN);
-      formData.append("agentName", agentData.agentName);
-      formData.append("agentEmail", agentData.agentEmail);
-      formData.append("servicesOffered", agentData.servicesOffered);
-      formData.append("phoneNumber", agentData.phoneNumber);
-      formData.append("agentAuthorizationLetter", file);
+    <Form.Item
+      label="Bank Name"
+      name="agentName"
+      rules={[{ required: true, message: 'Please enter the Bank Name' }]}
+      hasFeedback
+      validateStatus={errors.agentName ? 'error' : ''}
+      help={errors.agentName}
+    >
+      <Input value={formData.agentName} onChange={handleChange} placeholder="Enter bank name" />
+    </Form.Item>
 
+    <Form.Item
+      label="Email"
+      name="agentEmail"
+      rules={[
+        { required: true, message: 'Please enter the Email' },
+        { type: 'email', message: 'Please enter a valid email address' },
+      ]}
+      hasFeedback
+      validateStatus={errors.agentEmail ? 'error' : ''}
+      help={errors.agentEmail}
+    >
+      <Input value={formData.agentEmail} onChange={handleChange} placeholder="Enter email address" />
+    </Form.Item>
 
+    <Form.Item
+      label="Services Offered"
+      name="servicesOffered"
+      rules={[{ required: true, message: 'Please enter the Services Offered' }]}
+      hasFeedback
+      validateStatus={errors.servicesOffered ? 'error' : ''}
+      help={errors.servicesOffered}
+    >
+      <Input value={formData.servicesOffered} onChange={handleChange} placeholder="Enter services you offer" />
+    </Form.Item>
 
+    <Form.Item
+      label="Phone Number"
+      name="phoneNumber"
+      rules={[{ required: true, message: 'Please enter the Phone Number' }]}
+      hasFeedback
+      validateStatus={errors.phoneNumber ? 'error' : ''}
+      help={errors.phoneNumber}
+    >
+      <Input value={formData.phoneNumber} onChange={handleChange} placeholder="Enter phone number" />
+    </Form.Item>
 
+    <Form.Item
+      label="Authorization Letter"
+      name="agentAuthorizationLetter"
+      rules={[{ required: true, message: 'Please attach the Authorization Letter' }]}
+      validateStatus={errors.agentAuthorizationLetter ? 'error' : ''}
+      help={errors.agentAuthorizationLetter}
+    >
+      <Input type="file" onChange={handleFileChange} />
+    </Form.Item>
 
-   await axios.post('http://localhost:3000/agents', formData);
-        message.success('agent registered successfully!');
-        console.log('Service provider registered successfully!');
-        form.resetFields();
-        window.location.href = window.location.href;
-      } catch (error) {
-        message.error('Error submitting form:')
-        console.error('Error submitting form:', error);
-        // Handle the error, show an error message, etc.
-      }
-    }
-  };
-
-  return (
-    <Dashboard content={
-      <Form name="serviceProviderRegistrationForm" onFinish={handleSubmit}>
-
-
-        <h1>Agent Registration</h1>
-
-        <Form.Item
-            label="Business Identification Number"
-            validateStatus={errors.agentBIN && 'error'}
-            help={errors.agentBIN}
-          >
-            <Input name="agentBIN" onChange={handleChange} />
-          </Form.Item>
-
-          <Form.Item
-            label="Agent Name"
-            validateStatus={errors.agentName && 'error'}
-            help={errors.agentName}
-          >
-            <Input name="agentName" onChange={handleChange} />
-          </Form.Item>
-          <Form.Item
-            label="Agent Email"
-            validateStatus={errors.agentEmail && 'error'}
-            help={errors.agentEmail}
-          >
-            <Input name="agentEmail" onChange={handleChange} />
-          </Form.Item>
-
-        <Form.Item
-            label="Services Offered"
-            validateStatus={errors.servicesOffered && 'error'}
-            help={errors.servicesOffered}
-          >
-            <Input name="servicesOffered" onChange={handleChange} />
-          </Form.Item>
-
-        <Form.Item
-            label="Phone Number"
-            validateStatus={errors.phoneNumber && 'error'}
-            help={errors.phoneNumber}
-          >
-            <Input name="phoneNumber" onChange={handleChange} />
-          </Form.Item>
-
-
-        <Form.Item>
-          <label htmlFor="agentAuthorizationLetter">Agent Authorization Letter:</label>
-          <input
-            type="file"
-            name="agentAuthorizationLetter"
-            id="agentAuthorizationLetter"
-            accept=".jpeg, .jpg, .png, .gif"
-            onChange={handleFileChange}
-          />
-          {agentAuthorizationLetterUrl && (
-            <img src={agentAuthorizationLetterUrl} alt="Auth Letter" style={{ width: '200px' }} />
-          )}
-        </Form.Item>
-
-        <Form.Item>
-          <Button type="primary" htmlType="submit">Register</Button>
-        </Form.Item>
-      </Form>
-    } />
-  );
+    <Form.Item>
+      <Button type="primary" htmlType="submit">
+        Submit
+      </Button>
+    </Form.Item>
+  </Form>}/>
+);
 };
 
-export default AgentRegistrationForm;
+export default RegistrationForm;

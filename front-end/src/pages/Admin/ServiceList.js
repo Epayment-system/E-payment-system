@@ -9,14 +9,10 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
   const [form] = Form.useForm();
   const [editMode, setEditMode] = useState(false);
   const [serviceProvider, setServiceProvider] = useState(null);
-  const [serviceProviderAuthorizationLetterUrl, setServiceProviderAuthorizationLetterUrl] = useState();
-  const [selectedMenu, setSelectedMenu] = useState(['5']);
 
   useEffect(() => {
-    localStorage.setItem("selectedMenu", selectedMenu);
     fetchServiceProviders();
-  }, [selectedMenu]);
-  
+  }, []);
 
   const fetchServiceProviders = async () => {
     try {
@@ -42,20 +38,14 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
       cancelText: 'Cancel',
       onOk: () => {
         form.validateFields().then((values) => {
-          const updatedServiceProvider = { ...values };
+          const updatedServiceProvider = { ...values, id: serviceProvider.id };
           axios
-            .put(
-              `http://localhost:3000/serviceProviders/${updatedServiceProvider.serviceProviderBIN}`,
-              updatedServiceProvider
-            )
+            .put(`http://localhost:3000/serviceProviders/${updatedServiceProvider.id}`, updatedServiceProvider)
             .then((response) => {
               if (response.status === 200) {
                 message.success('Service provider data updated successfully.');
-                window.location.href = window.location.href;
                 const updatedData = serviceProviderData.map((sp) =>
-                  sp.serviceProviderBIN === updatedServiceProvider.serviceProviderBIN
-                    ? updatedServiceProvider
-                    : sp
+                  sp.id === updatedServiceProvider.id ? updatedServiceProvider : sp
                 );
                 setServiceProviderData(updatedData);
                 setEditMode(false);
@@ -72,7 +62,7 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
     });
   };
 
-  const handleDelete = (serviceProviderBIN) => {
+  const handleDelete = (serviceProviderId) => {
     Modal.confirm({
       title: 'Confirm Delete',
       content: 'Are you sure you want to delete this service provider?',
@@ -81,14 +71,11 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
       cancelText: 'Cancel',
       onOk: () => {
         axios
-          .delete(`http://localhost:3000/serviceProviders/${serviceProviderBIN}`)
+          .delete(`http://localhost:3000/serviceProviders/${serviceProviderId}`)
           .then((response) => {
             if (response.status === 200) {
               message.success('Service provider deleted successfully.');
-              window.location.href = window.location.href;
-              const updatedData = serviceProviderData.filter(
-                (sp) => sp.serviceProviderBIN !== serviceProviderBIN
-              );
+              const updatedData = serviceProviderData.filter((sp) => sp.id !== serviceProviderId);
               setServiceProviderData(updatedData);
             } else {
               message.error('Failed to delete service provider.');
@@ -111,6 +98,11 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
       title: 'Service Provider Name',
       dataIndex: 'serviceProviderName',
       key: 'serviceProviderName',
+    },
+    {
+      title: 'Service Provider Email',
+      dataIndex: 'serviceProviderEmail',
+      key: 'serviceProviderEmail',
     },
     {
       title: 'Services Offered',
@@ -136,18 +128,18 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
       title: 'Authorization Letter',
       dataIndex: 'serviceProviderAuthorizationLetter',
       key: 'serviceProviderAuthorizationLetter',
-      render: (_, serviceProvider) => (
+      render: (_, agent) => (
         <div>
-          {serviceProvider.serviceProviderAuthorizationLetter && (
+          {agent.agentAuthorizationLetter && (
             <div>
-              <a href={`http://localhost:3000/${serviceProvider.serviceProviderAuthorizationLetter}`} download>
+              <a href={`http://localhost:3000/${agent.agentAuthorizationLetter}`} download>
                 Authorization Letter
               </a>
               <Button
                 type="primary"
                 onClick={() => {
                   const downloadLink = document.createElement('a');
-                  downloadLink.href = `http://localhost:3000/${serviceProvider.serviceProviderAuthorizationLetter}`;
+                  downloadLink.href = `http://localhost:3000/${agent.agentAuthorizationLetter}`;
                   downloadLink.download = 'Authorization Letter';
                   downloadLink.target = '_blank';
                   downloadLink.click();
@@ -168,7 +160,7 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
           <Button onClick={() => handleEdit(serviceProvider)} icon={<EditOutlined />} type="danger">
             Edit
           </Button>
-          <Button onClick={() => handleDelete(serviceProvider.serviceProviderBIN)} icon={<DeleteOutlined />} type="danger">
+          <Button onClick={() => handleDelete(serviceProvider.id)} icon={<DeleteOutlined />} type="danger">
             Delete
           </Button>
         </div>
@@ -177,7 +169,7 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
   ];
 
   return (
-    <Dashboard selectedMenu={selectedMenu} content={
+    <Dashboard isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} content={
       <div>
         <h1>Service Providers List</h1>
         <Table dataSource={serviceProviderData} columns={columns} scroll={{ x: true }} />
@@ -197,6 +189,12 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
             <Form.Item name="serviceProviderName" label="Service Provider Name">
               <Input />
             </Form.Item>
+            <Form.Item name="serviceProviderEmail" label="Service Provider Email">
+              <Input />
+            </Form.Item>
+            <Form.Item name="serviceProviderPassword" label="Service Provider Password">
+              <Input.Password />
+            </Form.Item>
             <Form.Item name="servicesOffered" label="Services Offered">
               <Input />
             </Form.Item>
@@ -209,17 +207,9 @@ const ServiceProvidersList = ({ isLoggedIn, setIsLoggedIn }) => {
             <Form.Item name="phoneNumber" label="Phone Number">
               <Input />
             </Form.Item>
-            <Form.Item >
-          <label htmlFor="serviceProviderAuthorizationLetter">Authorization Letter:</label>
-              <input
-                type="file"
-                id="serviceProvider"
-                accept=".jpeg, .jpg, .png, .gif"
-              />
-              {serviceProviderAuthorizationLetterUrl && (
-                <img src={serviceProviderAuthorizationLetterUrl} alt="Auth Letter" style={{ width: '200px' }} />
-              )}
-          </Form.Item>
+            <Form.Item name="serviceProviderAuthorizationLetter" label="Service Provider Authorization Letter">
+              <Input type="file" />
+            </Form.Item>
             <Button type="primary" onClick={handleSave}>
               Save
             </Button>
