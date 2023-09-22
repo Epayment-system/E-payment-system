@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import companyLogo from '../image/logoimage.jpg';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { Select } from 'antd';
+import { Select, message } from 'antd';
 
 
 
@@ -14,6 +14,7 @@ const RegistrationForm = () => {
 
   const { Option } = Select;
   const [counter, setCounter] = useState(1);
+  const [isLoggedInUser, setIsLoggedInUser] = useState(false);
 
   const getNextUserID = () => {
     const timestamp = Date.now().toString(); // Get the current timestamp
@@ -108,6 +109,30 @@ const RegistrationForm = () => {
       throw error;
     }
   };
+  const checkUserNameExists = async (userName) => {
+    try {
+      const response = await axios.get('http://localhost:3000/Users');
+      const users = response.data;
+      const userNameExists = users.some((user) => user.UserName === userName);
+      return userNameExists;
+
+    } catch (error) {
+      console.error('Error checking user existence:', error);
+      throw error;
+    }
+  };
+  const checkPhoneNumberExists = async (phoneNumber) => {
+    try {
+      const response = await axios.get('http://localhost:3000/Users');
+      const users = response.data;
+      const PhoneNumberExists = users.some((user) => user.PhoneNumber === phoneNumber);
+      return PhoneNumberExists;
+
+    } catch (error) {
+      console.error('Error checking user existence:', error);
+      throw error;
+    }
+  };
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,9 +140,25 @@ const RegistrationForm = () => {
       setIsLoading(true);
       try {
         const userExists = await checkUserExists(formData.Email);
+        const userNameExists = await checkUserNameExists(formData.UserName);
+        const phoneNumberExists = await checkPhoneNumberExists(formData.PhoneNumber);
+        const errors = {};
+
         if (userExists) {
-          setErrors({ Email: 'User already exists' });
-          console.log('Existing user:', formData.Email);
+          errors.Email = 'Email already exists';
+          console.log('Existing email:', formData.Email);
+        }
+        if (userNameExists) {
+          errors.UserName = 'Username already taken';
+          console.log('Existing username:', formData.UserName);
+        }
+        if (phoneNumberExists) {
+          errors.PhoneNumber = 'Phone number already exists';
+          console.log('Existing phone number:', formData.PhoneNumber);
+        }
+
+        if (Object.keys(errors).length > 0) {
+          setErrors(errors);
         } else {
           const formDataToSend = new FormData();
           formDataToSend.append('UserID', formData.UserID);
@@ -130,11 +171,14 @@ const RegistrationForm = () => {
           formDataToSend.append('Email', formData.Email);
           formDataToSend.append('Address', formData.Address);
 
-          await axios.post('http://localhost:3000/Users', formDataToSend);
+          const response = await axios.post('http://localhost:3000/Users', formDataToSend);
 
 
           // Perform navigation to the service providers
-          navigate('/serviceProviders');
+          navigate('/login');
+          localStorage.setItem('isLoggedInUser', true);
+          localStorage.setItem('userData', JSON.stringify(response.data));
+          message.success('Registered successfully!');
           // Display success message using Toastify
           toast.success('Registered successfully!', {
             position: toast.POSITION.TOP_RIGHT,
@@ -142,6 +186,7 @@ const RegistrationForm = () => {
           });
           console.log('registration successful');
           setIsSubmitted(true);
+          setIsLoggedInUser(true);
         }
       } catch (error) {
         console.error('Error submitting form:', error);
@@ -167,10 +212,16 @@ const RegistrationForm = () => {
             E-payment-system
             <div className="slogan">your trusted online payment system</div>
           </div>
+
+        </div>
+      
+      <div className="menu" style={{ marginLeft: 'auto', padding:'50px' }}>
+        <div className="nav">
+          <Link to="/users" className="nav-item">HomePage</Link>
         </div>
       </div>
-
-      <div className="user-body"style={{marginTop: '15px'}}>
+      </div>
+      <div className="user-body" style={{ marginTop: '33px' }}>
         <ToastContainer />
 
         <form onSubmit={handleSubmit}>
@@ -214,19 +265,19 @@ const RegistrationForm = () => {
               </div>
 
               <div className="item">
-              <div className="select-item">
-                <label className="gender-title" value={formData.Gender}>
-                  Gender:
-                </label>
-                <div className="category">
-                  <select type="dropdown" name="Gender" onSelect={handleChange}>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
+                <div className="select-item">
+                  <label className="gender-title" value={formData.Gender}>
+                    Gender:
+                  </label>
+                  <div className="category">
+                    <select type="dropdown" name="Gender" onSelect={handleChange}>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
 
-                  {errors.Gender && <span className="error">{errors.Gender}</span>}
+                    {errors.Gender && <span className="error">{errors.Gender}</span>}
+                  </div>
                 </div>
-              </div>
               </div>
 
               <div className="item">
@@ -239,7 +290,7 @@ const RegistrationForm = () => {
                   onChange={handleChange}
                   placeholder="Enter your user name"
                 />
-                {errors.UserName && <span>{errors.UserName}</span>}
+                {errors.UserName && <div className="error-message">{errors.UserName}</div>}
               </div>
               <div className="item">
                 <label className="user-input">Password:</label>
@@ -266,7 +317,7 @@ const RegistrationForm = () => {
                 {errors.ConfirmPassword && <span>{errors.ConfirmPassword}</span>}
               </div>
               <div className="item">
-                <label className="user-input">Email:<br/> </label>
+                <label className="user-input">Email:<br /> </label>
                 <input
                   type="Email"
                   name="Email"
@@ -287,7 +338,8 @@ const RegistrationForm = () => {
                   onChange={handleChange}
                   placeholder="Enter your phone number"
                 />
-                {errors.PhoneNumber && <span>{errors.PhoneNumber}</span>}
+
+                {errors.PhoneNumber && <div className="error-message">{errors.PhoneNumber}</div>}
               </div>
               <div className="item">
                 <label className="user-input">Address:</label>
