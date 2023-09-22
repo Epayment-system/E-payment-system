@@ -1,23 +1,16 @@
 const express = require('express');
-const router = express.Router();
-const userController = require('../controller/UserController.js');
+const userRouter = express.Router();
+const UserController = require('../controller/UserController.js');
 
-// Get all users
-router.get('/', userController.get);
 
-// Create a new user
-router.post('/', userController.upload, userController.create);
-
-// User login
-router.post('/login', userController.login);
-
-// Get a single user by ID
-router.get('/:id', userController.getById);
-
-// Update a user by ID
-router.put('/:id', userController.upload, userController.update);
-
-// Delete a user by ID
-router.delete('/:id', userController.Delete);
-
-module.exports = router;
+userRouter.post('/',UserController.upload,UserController.create)
+userRouter.post('/login', UserController.login)
+userRouter.post('/verifyResetToken', UserController.verifyResetToken)
+userRouter.post('/updatePasswordWithToken', UserController.updatePasswordWithToken )
+userRouter.get('/', UserController.findAll)
+userRouter.get('/:id', UserController.findOne);
+userRouter.get('/serviceNo/:serviceNo', UserController.findOneByServiceNo);
+userRouter.put('/:id', UserController.upload, UserController.update)
+userRouter.delete('/:id', UserController.delete)
+userRouter.post('/requestPasswordReset', UserController.requestPasswordReset);
+module.exports= userRouter;
