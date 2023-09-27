@@ -118,3 +118,9 @@ exports.delete = asyncHandler(async (req, res) => {
 });
 
 // User login and authentication
+exports.login = asyncHandler(async (req, res) => {
+  try {
+    const { Email, Password } = req.body;
+    const user = await User.findOne({
+      where: { Email }
+  });
