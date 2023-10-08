@@ -1,55 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Dashboard from './Dashboard';
-import { Layout } from 'antd';
-import LOGO from '../../image/logoimage.jpg';
-import './style.css';
+import { Layout, Spin, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 const Home = ({ content }) => {
   const [adminData, setAdminData] = useState(JSON.parse(localStorage.getItem('adminData')));
-  const [selectedMenu, setSelectedMenu] = useState(['1']);
-
-  const handleCoinClick = (event) => {
-    const splashElement = document.querySelector('.splash-animation');
-    splashElement.style.top = `${event.clientY}px`;
-    splashElement.style.left = `${event.clientX}px`;
-    splashElement.classList.add('show');
-    setTimeout(() => {
-      splashElement.classList.remove('show');
-    }, 1000);
-  };
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const handleStorageChange = (event) => {
-      if (event.key === 'adminData') {
-        setAdminData(JSON.parse(event.newValue));
-      }
-    };
+    // Check if adminData exists
+    if (!adminData) {
+      setTimeout(() => {
+        navigate('/admin/login');
+        message.error('Please login to access the dashboard');
+      }, 5000);
+    } else {
+      setIsLoading(false);
+    }
+  }, [adminData, navigate]);
 
-    window.addEventListener('storage', handleStorageChange);
-
-    // Cleanup function
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const updatedAdminData = JSON.parse(localStorage.getItem('adminData'));
-    setAdminData(updatedAdminData);
-  }, [adminData]);
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Spin size="large" />
+        <p>Please wait while we check your login status...</p>
+      </div>
+    );
+  }
 
   return (
     <Dashboard
-      selectedMenu={selectedMenu}
       content={
         <Layout>
           <div
             className="site-layout-background"
             style={{ padding: 24, minHeight: 360, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
           >
+
             <h1 style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center' }}>
-              Welcome to E-Payment, {adminData.FirstName}!
+              Welcome to E-Payment, {adminData.user.FirstName}!
             </h1>
 
             <h2 style={{ fontSize: 20, color: 'rgb(5, 145, 246)', textAlign: 'center', marginBottom: 24 }}>
@@ -77,7 +67,8 @@ const Home = ({ content }) => {
               className="note3"
               style={{ backgroundColor: 'rgb(250, 250, 250)', borderRadius: 8, padding: 16, textAlign: 'center' }}
             >
-              <h4 style={{ fontSize: 16 }}>{/* Add your content here */}</h4>
+              <h4 style={{ fontSize: 16 }}>
+              </h4>
             </div>
           </div>
         </Layout>
